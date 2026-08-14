@@ -1,0 +1,57 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isOwner(userId) { return signedIn() && request.auth.uid == userId; }
+    function isAdmin() { return signedIn() && request.auth.token.role == 'admin'; }
+
+    match /offerings/{offeringId} {
+      allow read: if resource.data.status == 'published' || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /sessions/{sessionId} {
+      allow read: if resource.data.status in ['scheduled', 'completed'] || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /availabilitySlots/{slotId} {
+      allow read: if resource.data.status == 'available' || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId)
+        && request.resource.data.role == 'student'
+        && request.resource.data.email == request.auth.token.email;
+      allow update: if isOwner(userId)
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.email == resource.data.email;
+      allow delete: if isAdmin();
+    }
+
+    match /registrations/{registrationId} {
+      allow read: if signedIn() && (resource.data.studentId == request.auth.uid || isAdmin());
+      allow write: if false;
+    }
+
+    match /entitlements/{entitlementId} {
+      allow read: if signedIn() && (resource.data.studentId == request.auth.uid || isAdmin());
+      allow write: if false;
+    }
+
+    match /accessGrants/{grantId} {
+      allow read: if signedIn() && (resource.data.studentId == request.auth.uid || isAdmin());
+      allow write: if false;
+    }
+
+    // Meeting URLs, payment records, and webhook receipts are server-only.
+    match /videoMeetings/{meetingId} { allow read, write: if false; }
+    match /payments/{paymentId} { allow read, write: if false; }
+    match /webhookEvents/{eventId} { allow read, write: if false; }
+
+    match /{document=**} { allow read, write: if false; }
+  }
+}

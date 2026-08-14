@@ -1,0 +1,64 @@
+<section class="dashboard-page">
+  <div class="dashboard-heading">
+    <div>
+      <p class="eyebrow">Student dashboard</p>
+      <h1>Welcome, {{ auth.user()?.displayName || 'practitioner' }}.</h1>
+      <p>Your confirmed sessions and private meeting access live here.</p>
+    </div>
+    <a class="button button-outline" routerLink="/training">Find more training</a>
+  </div>
+
+  <div class="dashboard-layout">
+    <div class="dashboard-main">
+      <div class="panel-heading"><h2>Upcoming training</h2><span>{{ registrations().length }} registrations</span></div>
+      @if (message()) { <p class="form-message" role="status">{{ message() }}</p> }
+      @if (loading()) {
+        <div class="empty-state">Loading your training…</div>
+      } @else {
+        @for (registration of registrations(); track registration.id) {
+          <article class="registration-card">
+            <div class="registration-date">
+              <strong>{{ registration.nextSessionAt | date:'dd' }}</strong>
+              <span>{{ registration.nextSessionAt | date:'MMM' }}</span>
+            </div>
+            <div class="registration-copy">
+              <span class="status-pill" [class.confirmed]="registration.status === 'confirmed'">{{ registration.status === 'confirmed' ? 'Confirmed' : 'Payment pending' }}</span>
+              <h3>{{ registration.offeringTitle }}</h3>
+              <p>{{ registration.sessionIds.length }} live {{ registration.sessionIds.length === 1 ? 'session' : 'sessions' }} · Online via Zoom</p>
+            </div>
+            <div class="registration-actions">
+              @if (registration.status === 'confirmed' && registration.sessionIds[0]; as sessionId) {
+                @if (access()[sessionId]; as meeting) {
+                  <a class="button button-small" [href]="meeting.joinUrl" target="_blank" rel="noopener">Join Zoom</a>
+                  @if (meeting.passcode) { <small>Passcode: {{ meeting.passcode }}</small> }
+                } @else {
+                  <button class="button button-small" type="button" (click)="revealAccess(sessionId)">Show access</button>
+                }
+              }
+            </div>
+          </article>
+        } @empty {
+          <div class="empty-state">
+            <span>○</span><h3>No training booked yet</h3>
+            <p>Explore upcoming online classes, workshops, and private lessons.</p>
+            <a class="text-link" routerLink="/training">Browse training →</a>
+          </div>
+        }
+      }
+    </div>
+
+    <aside class="dashboard-aside">
+      <div class="aside-card ink-card">
+        <span class="live-dot"></span>
+        <p class="eyebrow">Before you join</p>
+        <h3>Arrive a few minutes early.</h3>
+        <p>Choose a quiet space, test your camera, and give yourself room to move.</p>
+      </div>
+      <div class="aside-card">
+        <p class="eyebrow">Account</p>
+        <strong>{{ auth.user()?.email }}</strong>
+        <button class="text-button" type="button" (click)="auth.signOut()">Sign out</button>
+      </div>
+    </aside>
+  </div>
+</section>

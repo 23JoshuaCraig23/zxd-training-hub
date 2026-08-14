@@ -1,0 +1,31 @@
+{
+  "hosting": {
+    "public": "dist/zxd-training-hub/browser",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [{ "source": "**", "destination": "/index.html" }],
+    "headers": [
+      {
+        "source": "**/*.@(js|css)",
+        "headers": [{ "key": "Cache-Control", "value": "public,max-age=31536000,immutable" }]
+      }
+    ]
+  },
+  "functions": [{
+    "source": "functions",
+    "codebase": "default",
+    "runtime": "nodejs22",
+    "predeploy": ["pnpm --dir $RESOURCE_DIR build"]
+  }],
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "emulators": {
+    "auth": { "port": 9099 },
+    "functions": { "port": 5001 },
+    "firestore": { "port": 8080 },
+    "hosting": { "port": 5000 },
+    "ui": { "enabled": true, "port": 4000 },
+    "singleProjectMode": true
+  }
+}

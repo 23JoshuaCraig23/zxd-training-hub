@@ -1,0 +1,39 @@
+<section class="auth-page">
+  <div class="auth-intro">
+    <a class="back-link" routerLink="/">← Back to training</a>
+    <p class="eyebrow">Student access</p>
+    <h1>Your practice<br><em>continues here.</em></h1>
+    <p>Sign in to manage registrations and reveal secure Zoom access for the sessions you have purchased.</p>
+    <div class="privacy-callout"><span>●</span><div><strong>Private by design</strong><small>Meeting links never appear on public pages.</small></div></div>
+  </div>
+
+  <div class="auth-panel">
+    <div class="auth-tabs">
+      <button type="button" [class.active]="mode() === 'signin'" (click)="setMode('signin')">Sign in</button>
+      <button type="button" [class.active]="mode() === 'register'" (click)="setMode('register')">Create account</button>
+    </div>
+
+    <h2>{{ isRegistering() ? 'Begin your training' : 'Welcome back' }}</h2>
+    <p>{{ isRegistering() ? 'Create one account for every class, lesson, and workshop.' : 'Enter your details to open your student dashboard.' }}</p>
+
+    @if (!auth.configured) {
+      <div class="form-message warning"><strong>Firebase setup needed.</strong> Add your Firebase web configuration before creating accounts.</div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      @if (isRegistering()) {
+        <label>Full name<input type="text" formControlName="name" autocomplete="name" placeholder="Your name"></label>
+      }
+      <label>Email address<input type="email" formControlName="email" autocomplete="email" placeholder="you@example.com"></label>
+      <label>Password<input type="password" formControlName="password" [autocomplete]="isRegistering() ? 'new-password' : 'current-password'" placeholder="At least 8 characters"></label>
+      <div class="form-row">
+        <span></span>
+        @if (!isRegistering()) { <button class="text-button" type="button" (click)="resetPassword()">Reset password</button> }
+      </div>
+      @if (message()) { <p class="form-message" role="status">{{ message() }}</p> }
+      <button class="button button-wide" type="submit" [disabled]="busy() || !auth.configured">
+        {{ busy() ? 'Please wait…' : (isRegistering() ? 'Create student account' : 'Sign in to dashboard') }}
+      </button>
+    </form>
+  </div>
+</section>

@@ -1,0 +1,89 @@
+<section class="hero">
+  <div class="hero-copy">
+    <p class="eyebrow">Live instruction · Wherever you train</p>
+    <h1>Find center.<br><em>Meet change.</em></h1>
+    <p class="hero-lede">
+      Join live Zhong Xin Dao I Liq Chuan classes, private lessons, and workshops with direct access from your student account.
+    </p>
+    <div class="hero-actions">
+      <a class="button" href="#upcoming">Explore training <span aria-hidden="true">↘</span></a>
+      <a class="text-link" routerLink="/auth">Already registered? Sign in</a>
+    </div>
+  </div>
+
+  <div class="hero-art" aria-label="A balanced circular form representing mindful movement">
+    <div class="orbit orbit-one"></div>
+    <div class="orbit orbit-two"></div>
+    <div class="center-disc">
+      <span>意</span>
+      <small>Mindful movement</small>
+    </div>
+    <div class="availability-note">
+      <span class="live-dot"></span>
+      Live online each week
+    </div>
+  </div>
+</section>
+
+<section class="principles-bar" aria-label="Training flow">
+  <span>Find training</span><i>→</i><span>Select a session</span><i>→</i><span>Register</span><i>→</i><span>Receive secure access</span><i>→</i><span>Train</span>
+</section>
+
+<section class="training-section" id="upcoming">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Upcoming live training</p>
+      <h2>A practice for every stage</h2>
+    </div>
+    <div class="filter-group" aria-label="Filter training by type">
+      @for (option of ['all', 'group', 'workshop', 'private']; track option) {
+        <button type="button" [class.active]="filter() === option" (click)="selectFilter($any(option))">
+          {{ option === 'all' ? 'All training' : (option | titlecase) }}
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (training.usingDemoData()) {
+    <p class="setup-note"><strong>Preview data:</strong> connect your Firebase project to load published offerings from Firestore.</p>
+  }
+
+  <div class="offering-grid">
+    @for (offering of filteredOfferings(); track offering.id; let index = $index) {
+      <article class="offering-card" [class.featured]="index === 0 && filter() === 'all'">
+        <div class="card-topline">
+          <span class="type-pill">{{ offering.eyebrow }}</span>
+          <span class="online-pill"><i></i> Zoom</span>
+        </div>
+        <div class="card-body">
+          <p class="date-line">{{ offering.nextStartAt | date:'EEE, MMM d · h:mm a' }} ET</p>
+          <h3>{{ offering.title }}</h3>
+          <p>{{ offering.description }}</p>
+          <dl class="offering-meta">
+            <div><dt>Format</dt><dd>{{ offering.durationLabel }}</dd></div>
+            <div><dt>Level</dt><dd>{{ offering.level }}</dd></div>
+            <div><dt>Instructor</dt><dd>{{ offering.instructorName }}</dd></div>
+          </dl>
+        </div>
+        <div class="card-footer">
+          <div><small>From</small><strong>{{ offering.priceCents / 100 | currency:offering.currency:'symbol':'1.0-0' }}</strong></div>
+          <a class="circle-link" [routerLink]="auth.user() ? '/dashboard' : '/auth'" [attr.aria-label]="'Register for ' + offering.title">↗</a>
+        </div>
+      </article>
+    } @empty {
+      <div class="empty-state">No training matches this filter yet.</div>
+    }
+  </div>
+</section>
+
+<section class="access-section">
+  <div>
+    <p class="eyebrow">One calm place to prepare</p>
+    <h2>Your training, ready when you are.</h2>
+  </div>
+  <div class="access-points">
+    <article><span>01</span><h3>Register securely</h3><p>Book a class, private lesson, or complete workshop from one account.</p></article>
+    <article><span>02</span><h3>Access stays private</h3><p>Zoom details appear only for confirmed students and their instructors.</p></article>
+    <article><span>03</span><h3>Join in one step</h3><p>Return to your dashboard before class and enter the right live session.</p></article>
+  </div>
+</section>
