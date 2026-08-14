@@ -18,6 +18,6 @@ describe('App', () => {
 
     expect(brand.textContent).toContain('Zhong Xin Dao I Liq Chuan New York City');
     expect(brand.textContent).toContain('Classes · Workshops · Private Lessons | In-Person & Online');
-    expect(brand.querySelector('img')?.getAttribute('src')).toBe('/images/zxd-ilc-horizontal-black.png');
+    expect(brand.querySelector('image')?.getAttribute('href')).toBe('/images/zxd-ilc-horizontal-black.png');
   });
 });
