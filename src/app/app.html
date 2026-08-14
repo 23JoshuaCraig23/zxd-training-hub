@@ -8,7 +8,8 @@
   </a>
 
   <nav aria-label="Main navigation">
-    <a routerLink="/training" routerLinkActive="active">Find training</a>
+    <a routerLink="/schedule" routerLinkActive="active">Schedule</a>
+    <a routerLink="/training" routerLinkActive="active">Training</a>
     @if (auth.user()) {
       <a routerLink="/dashboard" routerLinkActive="active">My training</a>
       <button class="nav-link" type="button" (click)="signOut()">Sign out</button>
@@ -28,6 +29,7 @@
     <p>Train attention. Cultivate balance. Meet change with awareness.</p>
   </div>
   <div class="footer-links">
+    <a routerLink="/schedule">Class calendar</a>
     <a routerLink="/training">Classes & workshops</a>
     <a routerLink="/auth">Student account</a>
   </div>

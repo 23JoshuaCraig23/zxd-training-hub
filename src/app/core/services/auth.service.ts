@@ -5,14 +5,17 @@ import {
   GoogleAuthProvider,
   User,
   createUserWithEmailAndPassword,
+  getIdTokenResult,
   onAuthStateChanged,
   sendPasswordResetEmail,
+  sendEmailVerification,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut as firebaseSignOut,
   updateProfile,
 } from 'firebase/auth';
 import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { httpsCallable } from 'firebase/functions';
 import { FirebaseService } from './firebase.service';
 
 @Injectable({ providedIn: 'root' })
@@ -24,6 +27,7 @@ export class AuthService {
 
   readonly user = signal<User | null>(null);
   readonly ready = signal(false);
+  readonly isAdmin = signal(false);
   readonly whenReady = new Promise<void>((resolve) => (this.resolveReady = resolve));
   readonly configured = this.firebase.configured;
 
@@ -33,7 +37,7 @@ export class AuthService {
       return;
     }
 
-    onAuthStateChanged(this.firebase.auth, (user) => this.finishInitialization(user));
+    onAuthStateChanged(this.firebase.auth, (user) => void this.finishInitialization(user));
   }
 
   async signIn(email: string, password: string): Promise<void> {
@@ -50,6 +54,7 @@ export class AuthService {
   async register(name: string, email: string, password: string): Promise<void> {
     const credential = await createUserWithEmailAndPassword(this.requireAuth(), email, password);
     await updateProfile(credential.user, { displayName: name });
+    await sendEmailVerification(credential.user);
 
     await this.ensureStudentProfile(credential.user, name);
   }
@@ -83,7 +88,20 @@ export class AuthService {
     });
   }
 
-  private finishInitialization(user: User | null): void {
+  private async finishInitialization(user: User | null): Promise<void> {
+    let claims = user ? await getIdTokenResult(user) : null;
+    if (user && claims?.claims['role'] !== 'admin' && this.firebase.functions) {
+      try {
+        const sync = httpsCallable<Record<string, never>, { isAdmin: boolean }>(this.firebase.functions, 'syncAdminAccess');
+        if ((await sync({})).data.isAdmin) {
+          await user.getIdToken(true);
+          claims = await getIdTokenResult(user);
+        }
+      } catch {
+        // Student access remains available; unverified admin emails receive no elevated role.
+      }
+    }
+    this.isAdmin.set(claims?.claims['role'] === 'admin');
     this.user.set(user);
     this.ready.set(true);
     if (!this.didResolveReady) {

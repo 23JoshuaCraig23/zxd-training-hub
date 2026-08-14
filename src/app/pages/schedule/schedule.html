@@ -1,0 +1,100 @@
+<section class="schedule-page">
+  <header class="schedule-hero">
+    <div><p class="eyebrow">Classes · Lessons · Workshops</p><h1>Plan your practice.</h1><p>Every time is anchored to New York and automatically translated for where you are.</p></div>
+    @if (auth.isAdmin()) { <a class="button button-outline" routerLink="/admin/schedule">Admin schedule</a> }
+  </header>
+
+  <div class="schedule-toolbar">
+    <div class="calendar-filters" aria-label="Filter calendar">
+      @for (option of [
+        {id:'all', label:'All'}, {id:'online', label:'Online'}, {id:'in_person', label:'In Person'},
+        {id:'private_lesson', label:'Private Lessons'}, {id:'workshop', label:'Workshops'}, {id:'mine', label:'My Schedule'}
+      ]; track option.id) {
+        <button type="button" [class.active]="filter() === option.id" (click)="setFilter($any(option.id))">{{ option.label }}</button>
+      }
+    </div>
+    <label class="timezone-picker">Display time
+      <select [ngModel]="displayZone()" (ngModelChange)="displayZone.set($event)">
+        @for (zone of timezoneChoices; track zone.label) { <option [value]="zone.value">{{ zone.label }}</option> }
+      </select>
+    </label>
+  </div>
+
+  <div class="calendar-shell">
+    <div class="calendar-heading">
+      <div class="calendar-navigation"><button type="button" (click)="move(-1)" aria-label="Previous period">←</button><button type="button" (click)="today()">Today</button><button type="button" (click)="move(1)" aria-label="Next period">→</button></div>
+      <h2>{{ formatMonth(anchor()) }}</h2>
+      <div class="view-switcher" aria-label="Calendar view">
+        @for (option of ['month','week','agenda']; track option) { <button type="button" [class.active]="view() === option" (click)="setView($any(option))">{{ option }}</button> }
+      </div>
+    </div>
+
+    @if (scheduling.loading()) { <div class="empty-state">Loading the schedule…</div> }
+    @else if (view() === 'agenda') {
+      <div class="agenda-view">
+        @for (day of visibleDays(); track day.key) {
+          <section class="agenda-day"><header><strong>{{ formatDay(day.date) }}</strong><span>{{ day.events.length }} events</span></header>
+            <div>@for (event of day.events; track event.id) {
+              <button class="agenda-event event-{{ event.type }}" type="button" (click)="open(event)">
+                <span class="event-kind">{{ eventLabel(event) }}</span><span class="event-time">{{ formatRange(event) }}</span><strong>{{ event.title }}</strong><small>{{ event.attendanceModes.includes('online') ? 'Online' : '' }}{{ event.attendanceModes.length > 1 ? ' + ' : '' }}{{ event.attendanceModes.includes('in_person') ? event.locationName || 'In person' : '' }}</small>
+              </button>
+            }</div>
+          </section>
+        } @empty { <div class="empty-state">No events match this filter.</div> }
+      </div>
+    } @else {
+      <div class="calendar-grid" [class.week-grid]="view() === 'week'">
+        @for (label of ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']; track label) { <div class="weekday-label">{{ label }}</div> }
+        @for (day of visibleDays(); track day.key) {
+          <section class="calendar-day" [class.outside]="isOutsideMonth(day)" [class.today]="isToday(day)">
+            <header><span>{{ day.date.getUTCDate() }}</span></header>
+            @if (view() === 'month') {
+              @for (event of nonPrivateEvents(day); track event.id) {
+                <button class="calendar-event event-{{ event.type }}" type="button" (click)="open(event)"><span>{{ eventLabel(event) }}</span><strong>{{ event.startTime }} {{ event.title }}</strong></button>
+              }
+              @if (privateEvents(day)[0]; as firstPrivate) {
+                <button class="calendar-event event-private_lesson" type="button" (click)="open(firstPrivate)"><span>Private</span><strong>{{ privateEvents(day).length }} available times</strong></button>
+              }
+            } @else {
+              @for (event of day.events; track event.id) {
+                <button class="calendar-event event-{{ event.type }}" type="button" (click)="open(event)"><span>{{ eventLabel(event) }}</span><strong>{{ event.startTime }} {{ event.title }}</strong></button>
+              }
+            }
+          </section>
+        }
+      </div>
+    }
+  </div>
+</section>
+
+@if (selected(); as event) {
+  <div class="event-backdrop" (click)="close()"></div>
+  <aside class="event-detail" role="dialog" aria-modal="true" [attr.aria-label]="event.title">
+    <button class="detail-close" type="button" (click)="close()" aria-label="Close event details">×</button>
+    <span class="event-kind">{{ eventLabel(event) }}</span>
+    <h2>{{ event.title }}</h2>
+    <p>{{ event.description }}</p>
+    <dl>
+      <div><dt>Date</dt><dd>{{ formatDay(event.start) }}</dd></div>
+      <div><dt>Your time</dt><dd>{{ formatRange(event) }}</dd></div>
+      <div><dt>New York</dt><dd>{{ event.startTime }}–{{ event.endTime }} America/New_York</dd></div>
+      <div><dt>Instructor</dt><dd>{{ event.instructorName }}</dd></div>
+      @if (event.locationName) { <div><dt>Location</dt><dd>{{ event.locationName }}<br><small>{{ event.address }}</small></dd></div> }
+      <div><dt>Price</dt><dd>{{ event.priceCents / 100 | currency:'USD' }}</dd></div>
+    </dl>
+    @if (event.type === 'private_lesson') {
+      <div class="private-time-picker"><strong>Available times</strong><div>
+        @for (option of privateDayOptions(event); track option.id) { <button type="button" [class.active]="option.id === event.id" (click)="open(option)">{{ option.startTime }}</button> }
+      </div></div>
+    }
+    @if (event.attendanceModes.length > 1) {
+      <fieldset><legend>How will you attend?</legend>
+        @if (event.attendanceModes.includes('in_person')) { <label><input type="radio" name="attendance" value="in_person" [ngModel]="attendanceMode()" (ngModelChange)="attendanceMode.set($event)"> In Person — Manhattan</label> }
+        @if (event.attendanceModes.includes('online')) { <label><input type="radio" name="attendance" value="online" [ngModel]="attendanceMode()" (ngModelChange)="attendanceMode.set($event)"> Online — Zoom</label> }
+      </fieldset>
+    }
+    @if (message()) { <p class="form-message" role="status">{{ message() }}</p> }
+    <button class="button button-wide" type="button" (click)="register()" [disabled]="busy()">{{ busy() ? 'Reserving…' : (event.type === 'private_lesson' ? 'Book this lesson' : 'Register') }}</button>
+    <small class="secure-note">Payment confirms registration. Zoom access remains private until confirmation.</small>
+  </aside>
+}

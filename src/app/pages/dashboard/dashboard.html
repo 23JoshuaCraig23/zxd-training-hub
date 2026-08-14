@@ -5,7 +5,7 @@
       <h1>Welcome, {{ auth.user()?.displayName || 'practitioner' }}.</h1>
       <p>Your confirmed sessions and private meeting access live here.</p>
     </div>
-    <a class="button button-outline" routerLink="/training">Find more training</a>
+    <a class="button button-outline" routerLink="/schedule">Find more training</a>
   </div>
 
   <div class="dashboard-layout">
@@ -24,10 +24,11 @@
             <div class="registration-copy">
               <span class="status-pill" [class.confirmed]="registration.status === 'confirmed'">{{ registration.status === 'confirmed' ? 'Confirmed' : 'Payment pending' }}</span>
               <h3>{{ registration.offeringTitle }}</h3>
-              <p>{{ registration.sessionIds.length }} live {{ registration.sessionIds.length === 1 ? 'session' : 'sessions' }} · Online via Zoom</p>
+              <p>{{ registration.sessionIds.length }} live {{ registration.sessionIds.length === 1 ? 'session' : 'sessions' }} · {{ registration.attendanceMode === 'in_person' ? 'In person — venue details confirmed' : 'Online via Zoom' }}</p>
+              @if (registration.attendanceMode === 'in_person' && registration.locationName) { <p><strong>{{ registration.locationName }}</strong> · {{ registration.address }}</p> }
             </div>
             <div class="registration-actions">
-              @if (registration.status === 'confirmed' && registration.sessionIds[0]; as sessionId) {
+              @if (registration.status === 'confirmed' && registration.attendanceMode !== 'in_person' && registration.sessionIds[0]; as sessionId) {
                 @if (access()[sessionId]; as meeting) {
                   <a class="button button-small" [href]="meeting.joinUrl" target="_blank" rel="noopener">Join Zoom</a>
                   @if (meeting.passcode) { <small>Passcode: {{ meeting.passcode }}</small> }
@@ -41,7 +42,7 @@
           <div class="empty-state">
             <span>○</span><h3>No training booked yet</h3>
             <p>Explore upcoming online classes, workshops, and private lessons.</p>
-            <a class="text-link" routerLink="/training">Browse training →</a>
+            <a class="text-link" routerLink="/schedule">Browse schedule →</a>
           </div>
         }
       }

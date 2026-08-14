@@ -28,6 +28,11 @@ export interface StudentRegistration {
   status: 'pending_payment' | 'confirmed' | 'cancelled';
   paymentStatus: 'not_required' | 'pending' | 'paid' | 'refunded';
   nextSessionAt?: Date;
+  occurrenceId?: string;
+  bookingId?: string;
+  attendanceMode?: 'online' | 'in_person';
+  locationName?: string;
+  address?: string;
 }
 
 export interface SessionAccess {

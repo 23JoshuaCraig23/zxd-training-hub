@@ -1,0 +1,40 @@
+<section class="admin-page">
+  <header class="admin-heading"><div><p class="eyebrow">Administrator scheduling</p><h1>Shape the training calendar.</h1><p>Changes are enforced by Firebase administrator claims and server-side functions.</p></div><a class="button button-outline" routerLink="/schedule">View public calendar</a></header>
+  <div class="admin-stats">
+    <article><strong>{{ counts().registrations }}</strong><span>Total registrations</span></article>
+    <article><strong>{{ counts().privateBookings }}</strong><span>Private bookings</span></article>
+    <article><strong>{{ counts().inPersonRegistrations }}</strong><span>In person</span></article>
+    <article><strong>{{ counts().onlineRegistrations }}</strong><span>Online</span></article>
+  </div>
+  @if (message()) { <p class="form-message" role="status">{{ message() }}</p> }
+  <div class="admin-grid">
+    <form class="admin-panel admin-workshop" [formGroup]="recurringForm" (ngSubmit)="saveRecurring()">
+      <p class="eyebrow">Recurring classes</p><h2>Create, modify, or cancel a series</h2><p>Weekdays use 1=Monday through 5=Friday. Reuse an existing ID to modify that series without changing individual overrides.</p>
+      <div class="form-columns"><label>Schedule ID<input formControlName="id"></label><label>Title<input formControlName="title"></label><label>Weekdays<input formControlName="weekdays" placeholder="1,2,3,4,5"></label></div>
+      <label>Description<input formControlName="description"></label>
+      <div class="form-columns"><label>Start<input type="time" formControlName="startTime"></label><label>End<input type="time" formControlName="endTime"></label><label>Type<select formControlName="type"><option value="online_class">Online class</option><option value="hybrid_class">Hybrid class</option></select></label><label>Attendance<select formControlName="mode"><option value="online">Online</option><option value="in_person">In person</option><option value="hybrid">Hybrid</option></select></label><label>Price USD<input type="number" formControlName="price"></label><label>Status<select formControlName="status"><option value="active">Active</option><option value="cancelled">Cancel series</option></select></label></div>
+      <button class="button" type="submit" [disabled]="busy()">Save recurring schedule</button>
+    </form>
+    <form class="admin-panel" [formGroup]="availabilityForm" (ngSubmit)="saveAvailability()">
+      <p class="eyebrow">Private lessons</p><h2>Block or restore availability</h2><p>Leave time blank to affect the entire day or date range.</p>
+      <div class="form-columns"><label>Start date<input type="date" formControlName="startDate"></label><label>End date<input type="date" formControlName="endDate"></label></div>
+      <label>Specific starting time (optional)<input type="time" formControlName="startTime"></label>
+      <div class="form-columns"><label>Action<select formControlName="action"><option value="block">Block</option><option value="restore">Restore</option><option value="add">Add unusual time</option></select></label><fieldset><legend>Allowed modes</legend><label><input type="checkbox" formControlName="inPerson"> In person</label><label><input type="checkbox" formControlName="online"> Online</label></fieldset></div>
+      <button class="button" type="submit" [disabled]="busy()">Save availability</button>
+    </form>
+    <form class="admin-panel" [formGroup]="cancellationForm" (ngSubmit)="cancelOccurrence()">
+      <p class="eyebrow">One recurrence</p><h2>Cancel an occurrence</h2><p>Use the event ID shown in the calendar data, such as <code>daytime_2026-09-14</code>.</p>
+      <label>Occurrence ID<input formControlName="occurrenceId" placeholder="daytime_2026-09-14"></label>
+      <button class="button" type="submit" [disabled]="busy()">Cancel occurrence</button>
+    </form>
+    <form class="admin-panel admin-workshop" [formGroup]="workshopForm" (ngSubmit)="createWorkshop()">
+      <p class="eyebrow">Special events</p><h2>Create a workshop</h2><p>Comma-separated dates become calendar sessions under one registration product.</p>
+      <div class="form-columns"><label>Title<input formControlName="title"></label><label>Dates<input formControlName="dates" placeholder="2026-09-19, 2026-09-20"></label></div>
+      <label>Description<input formControlName="description"></label>
+      <div class="form-columns"><label>Start<input type="time" formControlName="startTime"></label><label>End<input type="time" formControlName="endTime"></label><label>Attendance<select formControlName="mode"><option value="in_person">In person</option><option value="online">Online</option><option value="hybrid">Hybrid</option></select></label></div>
+      <div class="form-columns"><label>Price USD<input type="number" formControlName="price"></label><label>Member price USD<input type="number" formControlName="memberPrice"></label><label>Capacity<input type="number" formControlName="capacity"></label></div>
+      <div class="form-columns"><label>Location<input formControlName="locationName"></label><label>Address<input formControlName="address"></label></div>
+      <button class="button" type="submit" [disabled]="busy()">Publish workshop</button>
+    </form>
+  </div>
+</section>

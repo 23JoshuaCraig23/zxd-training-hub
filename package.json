@@ -8,6 +8,7 @@
     "build:all": "pnpm build && pnpm --dir functions build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "admins:grant": "node scripts/grant-admin-access.mjs",
     "emulators": "firebase emulators:start",
     "deploy": "pnpm build:all && firebase deploy"
   },

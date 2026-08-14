@@ -1,6 +1,6 @@
 # Zhong Xin Dao Training Hub
 
-An Angular 22 + Firebase starter for live Zhong Xin Dao I Liq Chuan training. It includes a public training catalog, Firebase email/password authentication, a protected student dashboard, Firestore security rules, Firebase Hosting configuration, and Cloud Functions foundations for PayPal-verified registrations and Zoom access.
+An Angular 22 + Firebase application for live Zhong Xin Dao I Liq Chuan training. It includes a timezone-safe class calendar, recurring and hybrid classes, concurrency-safe private lesson booking, multi-day workshops, Firebase email/Google authentication, a protected student dashboard, claim-protected scheduling administration, PayPal-verified registrations, and private Zoom access.
 
 ## What is implemented
 
@@ -42,6 +42,8 @@ Do not commit `.firebaserc` if the project ID is private; it is ignored. `.fireb
 The Angular app first checks Firebase Hosting's browser-safe configuration at `/__/firebase/init.json`, then falls back to the registered Web App configuration in `public/firebase-config.json`. The fallback is committed because Firebase Web App configuration is public metadata delivered to every browser; it contains no server credentials.
 
 Firebase's browser `apiKey` identifies a project but is not a server credential and is visible to every browser after deployment. Protect Firebase data with the included Security Rules, authorized domains, API-key restrictions, and App Check—not by treating that browser key as a password.
+
+The scheduling architecture and collection responsibilities are documented in [`docs/scheduling.md`](docs/scheduling.md).
 
 ## 2. Configure server secrets
 
