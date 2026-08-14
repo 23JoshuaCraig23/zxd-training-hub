@@ -14,6 +14,10 @@ describe('App', () => {
   it('renders the training brand', () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).toContain('Zhong Xin Dao');
+    const brand: HTMLAnchorElement = fixture.nativeElement.querySelector('.brand');
+
+    expect(brand.textContent).toContain('Zhong Xin Dao I Liq Chuan New York City');
+    expect(brand.textContent).toContain('Classes & Workshops: In-person & Online');
+    expect(brand.querySelector('img')?.getAttribute('src')).toBe('/images/zxd-ilc-horizontal-black.png');
   });
 });
