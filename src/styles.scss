@@ -16,7 +16,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .brand-logo-frame img { width: 106%; max-width: none; height: auto; position: absolute; top: -35%; left: -3%; display: block; }
 .brand-copy { min-width: 0; display: flex; flex-direction: column; letter-spacing: .01em; }
 .brand strong { max-width: 430px; font-family: var(--serif); font-size: clamp(14px, 1.25vw, 18px); line-height: 1.15; }
-.brand small { max-width: 430px; margin-top: 6px; color: var(--muted); font-size: clamp(8px, .72vw, 10px); font-weight: 700; letter-spacing: .045em; line-height: 1.25; }
+.brand small { max-width: 470px; margin-top: 7px; color: var(--rust-dark); font-size: clamp(10px, .85vw, 12px); font-weight: 800; letter-spacing: .025em; line-height: 1.25; }
 .site-header nav { display: flex; align-items: center; gap: clamp(18px, 3vw, 42px); }
 .site-header nav > a:not(.button), .nav-link { padding: 8px 0; border: 0; background: transparent; color: var(--ink); font-size: 13px; font-weight: 650; text-decoration: none; cursor: pointer; }
 .site-header nav > a.active { color: var(--rust); }
@@ -189,7 +189,7 @@ form input:focus { border-color: var(--ink); outline: 0; box-shadow: 0 0 0 3px r
 }
 @media (max-width: 760px) {
   .site-header { min-height: 96px; padding-top: 9px; padding-bottom: 9px; gap: 15px; } .site-header nav { gap: 13px; } .site-header nav > a:not(.button), .nav-link { display: none; }
-  .brand { gap: 10px; } .brand-logo-frame { width: 112px; height: 54px; } .brand strong { max-width: 245px; font-size: 13px; } .brand small { max-width: 250px; margin-top: 4px; font-size: 8px; }
+  .brand { gap: 10px; } .brand-logo-frame { width: 112px; height: 54px; } .brand strong { max-width: 245px; font-size: 13px; } .brand small { max-width: 280px; margin-top: 4px; font-size: 9px; }
   .hero { padding-top: 65px; grid-template-columns: 1fr; } .hero-art { min-height: 390px; margin-top: 25px; } .hero-actions { align-items: flex-start; flex-direction: column; gap: 17px; }
   .principles-bar { justify-content: center; flex-wrap: wrap; } .principles-bar span:nth-of-type(n+4), .principles-bar i:nth-of-type(n+4) { display: none; }
   .section-heading, .dashboard-heading { align-items: flex-start; flex-direction: column; } .filter-group { width: 100%; overflow-x: auto; } .filter-group button { flex: 1 0 auto; }
