@@ -1,0 +1,36 @@
+steps:
+  - id: install-test-build
+    name: node:22-bookworm
+    entrypoint: bash
+    env:
+      - CI=true
+      - NG_BUILD_MAX_WORKERS=2
+    args:
+      - -ceu
+      - |
+        corepack enable
+        corepack prepare pnpm@11.19.0 --activate
+        pnpm install --frozen-lockfile
+        pnpm exec ng test --watch=false --no-progress
+        pnpm build:all
+
+  - id: deploy-firebase
+    name: node:22-bookworm
+    entrypoint: bash
+    env:
+      - CI=true
+    args:
+      - -ceu
+      - |
+        corepack enable
+        corepack prepare pnpm@11.19.0 --activate
+        ./node_modules/.bin/firebase deploy \
+          --project="${PROJECT_ID}" \
+          --only=firestore,functions,hosting \
+          --non-interactive
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: E2_HIGHCPU_8
+
+timeout: 1800s

@@ -11,17 +11,18 @@ An Angular 22 + Firebase starter for live Zhong Xin Dao I Liq Chuan training. It
 - Server-side PayPal order creation and webhook verification. A browser return from PayPal never confirms payment.
 - Idempotent Zoom meeting creation: one deterministic meeting record per session, shared by all confirmed students.
 - Subscription/entitlement registration path kept separate from one-time payment.
-- Firestore rules, indexes, local Emulator Suite configuration, and GitHub Actions build checks.
+- Firestore rules, indexes, local Emulator Suite configuration, and Google Cloud Build deployment.
 
 See [docs/architecture.md](docs/architecture.md) for the data model and protected workflow.
 
-## Prerequisites
+## Cloud deployment prerequisites
 
-- Node.js 24+
-- pnpm 11+
 - A Firebase project on the Blaze plan (Cloud Functions makes outbound Zoom/PayPal requests)
+- A GitHub repository connected to Google Cloud Build
 - A Zoom Server-to-Server OAuth app
 - A PayPal developer application and webhook
+
+The default workflow does not require Node, npm, pnpm, Firebase CLI, or Java on a local computer. Google Cloud Build provides the complete build environment. See [docs/cloud-build.md](docs/cloud-build.md).
 
 ## 1. Connect Firebase
 
@@ -84,7 +85,18 @@ All Zoom and PayPal credentials are declared with Firebase `defineSecret`. They 
 
 After deploying `handlePayPalWebhook`, register its HTTPS URL in the PayPal dashboard for `PAYMENT.CAPTURE.COMPLETED` events.
 
-## 3. Run locally
+## 3. Build and deploy in Google Cloud
+
+Connect the GitHub repository to **Cloud Build → Repositories**, then create a `main` branch trigger using `/cloudbuild.yaml` and the dedicated deployment service account described in [docs/cloud-build.md](docs/cloud-build.md).
+
+Every push to `main` will:
+
+1. Install locked dependencies in Node.js 22.
+2. Run Angular tests.
+3. Build Angular and Firebase Functions.
+4. Deploy Firestore, Functions, and Hosting to the trigger's Google Cloud project.
+
+## 4. Optional local development
 
 For the visual app with preview data:
 
@@ -100,7 +112,9 @@ pnpm emulators
 pnpm start
 ```
 
-## 4. Validate and deploy
+Local prerequisites are Node.js 22+, pnpm 11+, and Java 21+ for the Firebase emulators. Local installation is optional.
+
+## 5. Manual local validation and deployment
 
 ```bash
 pnpm test -- --run
@@ -110,7 +124,7 @@ pnpm deploy
 
 The Angular SPA deploys to Firebase Hosting, and `firebase.json` rewrites application routes to `index.html`.
 
-## 5. Publish the repository to GitHub
+## 6. Publish the repository to GitHub
 
 The repository is already initialized locally on the `main` branch. Create an empty GitHub repository, then connect and push it:
 
@@ -119,7 +133,7 @@ git remote add origin git@github.com:YOUR_ORG/zxd-training-hub.git
 git push -u origin main
 ```
 
-No Firebase, Zoom, or PayPal secrets belong in GitHub. The included workflow runs both frontend and Functions builds on pushes and pull requests.
+No Firebase, Zoom, or PayPal secrets belong in GitHub. Google Cloud Build handles tests, builds, and Firebase deployment after each push to `main`.
 
 ## Next product slices
 
