@@ -18,14 +18,20 @@ No PayPal or Zoom value is injected into the build. Deployed Functions reference
 3. Create a dedicated service account named `firebase-cloud-build`.
 4. Grant it the project roles needed to deploy this stack:
    - Cloud Build Service Account
-   - Firebase Admin
+   - Logs Writer
+   - Firebase Hosting Admin
+   - Firebase Viewer
+   - API Keys Viewer
+   - Service Usage Consumer
    - Cloud Functions Admin
-   - Cloud Run Admin
-   - Artifact Registry Administrator
-   - Secret Manager Admin
-5. Grant **Service Account User** on the Functions runtime service account to `firebase-cloud-build`.
-6. In **Cloud Build → Repositories**, connect the GitHub repository using the Cloud Build GitHub App.
-7. In **Cloud Build → Triggers**, create a push-to-branch trigger:
+   - Artifact Registry Writer
+   - Secret Manager Viewer
+   - Cloud Datastore Index Admin
+   - Firebase Rules Admin
+5. Grant **Service Account User** only on the Functions runtime service account to `firebase-cloud-build`.
+6. Grant **Secret Manager Secret Accessor** on the six integration secrets only to the Functions runtime service account. The build account can inspect secret metadata but cannot read secret values.
+7. In **Cloud Build → Repositories**, connect the GitHub repository using the Cloud Build GitHub App.
+8. In **Cloud Build → Triggers**, create a push-to-branch trigger:
    - Branch: `^main$`
    - Configuration: Cloud Build configuration file
    - Location: `/cloudbuild.yaml`
