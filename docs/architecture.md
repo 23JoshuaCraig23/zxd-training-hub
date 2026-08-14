@@ -35,7 +35,7 @@ The user's browser return from checkout is never evidence of payment.
 
 ## Secrets and public configuration
 
-- Zoom and PayPal credentials live in the `ZOOM_CONFIG` and `PAYPAL_CONFIG` JSON secrets in Firebase Secret Manager and are injected only into the Functions that declare them.
+- Zoom and PayPal credentials use the individual `PayPalClientID`, `PayPalSecret`, `PayPalWebhookID`, `ZoomAccountID`, `ZoomClientID`, and `ZoomClientSecret` entries in Firebase Secret Manager. They are injected only into the Functions that declare them.
 - Firebase Hosting supplies the browser configuration dynamically at `/__/firebase/init.json`; no project configuration is committed.
 - A Firebase Web API key is necessarily public in a browser app. Firestore Rules, authorized domains, API restrictions, and App Check enforce access.
 - Meeting URLs and payment provider records are server-only Firestore documents.

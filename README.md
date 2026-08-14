@@ -50,33 +50,37 @@ Create a Zoom Server-to-Server OAuth app with meeting read/write scopes and a Pa
 
 1. From Firebase Project Settings, open the linked Google Cloud project.
 2. In Google Cloud Console, open **Security → Secret Manager** (enable the API if prompted).
-3. Choose **Create secret**, name it `ZOOM_CONFIG`, and enter this JSON with real values:
+3. Create these secrets using the exact names shown. The first five match the existing Google Cloud setup:
 
-```json
-{"accountId":"...","clientId":"...","clientSecret":"..."}
-```
+| Secret name        | Value                                        |
+| ------------------ | -------------------------------------------- |
+| `PayPalClientID`   | PayPal REST application client ID            |
+| `PayPalSecret`     | PayPal REST application secret               |
+| `ZoomAccountID`    | Zoom Server-to-Server OAuth account ID       |
+| `ZoomClientID`     | Zoom Server-to-Server OAuth client ID        |
+| `ZoomClientSecret` | Zoom Server-to-Server OAuth client secret    |
+| `PayPalWebhookID`  | PayPal webhook ID for signature verification |
 
-4. Create `PAYPAL_CONFIG` with Sandbox values:
-
-```json
-{"clientId":"...","clientSecret":"...","webhookId":"...","apiBase":"https://api-m.sandbox.paypal.com"}
-```
-
+4. Add the missing `PayPalWebhookID` secret after creating the webhook in the PayPal developer dashboard. This ID is required to verify that registration events really came from PayPal.
 5. Run `pnpm firebase deploy --only functions`. Deployment binds each secret only to the Functions that declare it. Redeploy Functions after creating a new secret version.
 
-For production PayPal, change `apiBase` to `https://api-m.paypal.com` and use production credentials and the production webhook ID.
+PayPal uses Sandbox by default. Set the non-secret `PAYPAL_API_BASE` Functions parameter to `https://api-m.paypal.com` when production credentials and production webhook validation are ready.
 
 ### Using the CLI
 
 The Firebase CLI is the recommended shortcut because it creates a secret version and prompts without echoing the value into a command:
 
 ```bash
-pnpm firebase functions:secrets:set ZOOM_CONFIG --format=json
-pnpm firebase functions:secrets:set PAYPAL_CONFIG --format=json
+pnpm firebase functions:secrets:set PayPalClientID
+pnpm firebase functions:secrets:set PayPalSecret
+pnpm firebase functions:secrets:set PayPalWebhookID
+pnpm firebase functions:secrets:set ZoomAccountID
+pnpm firebase functions:secrets:set ZoomClientID
+pnpm firebase functions:secrets:set ZoomClientSecret
 pnpm firebase deploy --only functions
 ```
 
-All Zoom and PayPal credentials are declared with Firebase `defineJsonSecret`. They are read only inside explicitly bound Cloud Functions at runtime and are never bundled into Angular, stored in Firestore, or committed to GitHub.
+All Zoom and PayPal credentials are declared with Firebase `defineSecret`. They are read only inside explicitly bound Cloud Functions at runtime and are never bundled into Angular, stored in Firestore, or committed to GitHub.
 
 After deploying `handlePayPalWebhook`, register its HTTPS URL in the PayPal dashboard for `PAYMENT.CAPTURE.COMPLETED` events.
 
