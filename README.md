@@ -65,7 +65,7 @@ Create a Zoom Server-to-Server OAuth app with meeting read/write scopes and a Pa
 4. Add the missing `PayPalWebhookID` secret after creating the webhook in the PayPal developer dashboard. This ID is required to verify that registration events really came from PayPal.
 5. Run `pnpm firebase deploy --only functions`. Deployment binds each secret only to the Functions that declare it. Redeploy Functions after creating a new secret version.
 
-PayPal uses Sandbox by default. Set the non-secret `PAYPAL_API_BASE` Functions parameter to `https://api-m.paypal.com` when production credentials and production webhook validation are ready.
+PayPal uses Sandbox by default through the committed, non-secret `functions/.env.iliqchuan-nyc` parameter file. Change `PAYPAL_API_BASE` there to `https://api-m.paypal.com` only when production credentials and production webhook validation are ready. Never add credentials to an environment file; they belong in Secret Manager.
 
 ### Using the CLI
 
