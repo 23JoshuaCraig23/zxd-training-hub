@@ -39,7 +39,7 @@ pnpm firebase use --add
 
 Do not commit `.firebaserc` if the project ID is private; it is ignored. `.firebaserc.example` documents the shape.
 
-Firebase Hosting automatically serves the browser-safe app configuration at `/__/firebase/init.json`; the Angular app loads it before startup. No Firebase configuration is compiled into the repository. For `ng serve`, create an ignored `public/firebase-config.json` containing the Firebase Web App configuration from Project Settings. The filename is already in `.gitignore`.
+The Angular app first checks Firebase Hosting's browser-safe configuration at `/__/firebase/init.json`, then falls back to the registered Web App configuration in `public/firebase-config.json`. The fallback is committed because Firebase Web App configuration is public metadata delivered to every browser; it contains no server credentials.
 
 Firebase's browser `apiKey` identifies a project but is not a server credential and is visible to every browser after deployment. Protect Firebase data with the included Security Rules, authorized domains, API-key restrictions, and App Check—not by treating that browser key as a password.
 

@@ -42,7 +42,6 @@ yarn-error.log
 firebase-debug.log
 firestore-debug.log
 ui-debug.log
-/public/firebase-config.json
 /libpeerconnection.log
 testem.log
 /typings
