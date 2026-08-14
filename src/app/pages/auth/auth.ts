@@ -48,6 +48,19 @@ export class Auth {
     }
   }
 
+  protected async continueWithGoogle(): Promise<void> {
+    this.busy.set(true);
+    this.message.set('');
+    try {
+      await this.auth.signInWithGoogle();
+      await this.router.navigateByUrl(this.route.snapshot.queryParamMap.get('returnUrl') || '/dashboard');
+    } catch (error) {
+      this.message.set(this.friendlyError(error));
+    } finally {
+      this.busy.set(false);
+    }
+  }
+
   protected async resetPassword(): Promise<void> {
     const email = this.form.controls.email.value.trim();
     if (!email || this.form.controls.email.invalid) {
@@ -66,6 +79,9 @@ export class Auth {
     const code = (error as { code?: string }).code;
     if (code === 'auth/invalid-credential') return 'That email and password do not match.';
     if (code === 'auth/email-already-in-use') return 'An account already exists for that email.';
+    if (code === 'auth/account-exists-with-different-credential') return 'Use the sign-in method already associated with this email address.';
+    if (code === 'auth/popup-closed-by-user') return 'Google sign-in was cancelled.';
+    if (code === 'auth/popup-blocked') return 'Your browser blocked the Google sign-in window. Allow popups and try again.';
     if (code === 'auth/weak-password') return 'Choose a stronger password with at least 8 characters.';
     return error instanceof Error ? error.message : 'Something went wrong. Please try again.';
   }

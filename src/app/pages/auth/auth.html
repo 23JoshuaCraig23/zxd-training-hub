@@ -20,6 +20,12 @@
       <div class="form-message warning"><strong>Firebase setup needed.</strong> Add your Firebase web configuration before creating accounts.</div>
     }
 
+    <button class="google-sign-in" type="button" (click)="continueWithGoogle()" [disabled]="busy() || !auth.configured">
+      <span aria-hidden="true">G</span>
+      Continue with Google
+    </button>
+    <div class="auth-divider"><span>or use email</span></div>
+
     <form [formGroup]="form" (ngSubmit)="submit()">
       @if (isRegistering()) {
         <label>Full name<input type="text" formControlName="name" autocomplete="name" placeholder="Your name"></label>
