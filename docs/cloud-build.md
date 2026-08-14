@@ -14,7 +14,7 @@ No PayPal or Zoom value is injected into the build. Deployed Functions reference
 ## One-time Google Cloud setup
 
 1. Select `iliqchuan-nyc` in Google Cloud Console.
-2. Enable the Cloud Build, Firebase Management, Cloud Functions, Cloud Run, Artifact Registry, Secret Manager, and Cloud Resource Manager APIs.
+2. Enable the Cloud Build, Firebase Management, Firebase Extensions, Cloud Billing, Cloud Functions, Cloud Run, Artifact Registry, Secret Manager, and Cloud Resource Manager APIs.
 3. Create a dedicated service account named `firebase-cloud-build`.
 4. Grant it the project roles needed to deploy this stack:
    - Cloud Build Service Account
@@ -28,10 +28,11 @@ No PayPal or Zoom value is injected into the build. Deployed Functions reference
    - Secret Manager Viewer
    - Cloud Datastore Index Admin
    - Firebase Rules Admin
-5. Grant **Service Account User** only on the Functions runtime service account to `firebase-cloud-build`.
-6. Grant **Secret Manager Secret Accessor** on the six integration secrets only to the Functions runtime service account. The build account can inspect secret metadata but cannot read secret values.
-7. In **Cloud Build → Repositories**, connect the GitHub repository using the Cloud Build GitHub App.
-8. In **Cloud Build → Triggers**, create a push-to-branch trigger:
+5. Grant **Service Account User** only on the default Compute and App Engine service accounts to `firebase-cloud-build`. The Firebase CLI validates both identities while deploying second-generation Functions.
+6. Grant **Secret Manager Secret Accessor** on the six integration secrets only to the default Compute service account used by the deployed Functions. The build account can inspect secret metadata but cannot read secret values.
+7. Set a cleanup policy on the `gcf-artifacts` repository in `us-central1`. This project retains function container images for 7 days.
+8. In **Cloud Build → Repositories**, connect the GitHub repository using the Cloud Build GitHub App.
+9. In **Cloud Build → Triggers**, create a push-to-branch trigger:
    - Branch: `^main$`
    - Configuration: Cloud Build configuration file
    - Location: `/cloudbuild.yaml`
